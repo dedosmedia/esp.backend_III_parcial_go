@@ -203,6 +203,16 @@ func GetTicketList() []Ticket {
 	return ticketList
 }
 
+// Obtiene la lista de todos los paises
+func GetDestionations() []string {
+	var destinations []string
+	for destination := range destinationMap {
+		destinations = append(destinations, destination)
+	}
+
+	return destinations
+}
+
 // Función que calcule cuántas personas viajan a un país determinado.
 func GetTotalTickets(destination string) (int, error) {
 

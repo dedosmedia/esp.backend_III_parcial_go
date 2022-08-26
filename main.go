@@ -10,23 +10,22 @@ func main() {
 	tickets.LoadFile("tickets.csv")
 	fmt.Println("Total de registros correctos en el archivo: ", len(tickets.GetTicketList()))
 
-	ReportTicketsByDestination("Canada")
-	ReportTicketsByDestination("Portugal")
-	ReportTicketsByDestination("Colombia")
-	ReportTicketsByDestination("Mexico")
-	ReportTicketsByDestination("No existe")
+	fmt.Println("Lista de paises de destino")
+	destinations := tickets.GetDestionations()
+	for _, destination := range destinations {
+		fmt.Println("\nPAIS: ", destination)
+		ReportTicketsByDestination(destination)
+		ReportTicketsPriceByDestination(destination)
+		fmt.Println("================")
+		fmt.Println()
+	}
 
+	fmt.Println("Reporte de tickets vendidos por periodo de tiempo")
 	ReportTicketsByPeriod("madrugada")
 	ReportTicketsByPeriod("mañana")
 	ReportTicketsByPeriod("tarde")
 	ReportTicketsByPeriod("noche")
 	ReportTicketsByPeriod("No existe")
-
-	ReportTicketsPriceByDestination("Canada")
-	ReportTicketsPriceByDestination("Portugal")
-	ReportTicketsPriceByDestination("Colombia")
-	ReportTicketsPriceByDestination("Mexico")
-	ReportTicketsPriceByDestination("No existe")
 
 }
 
