@@ -24,14 +24,17 @@ type TicketError struct {
 	Desc  string
 }
 
+type Tickets []Ticket
+type TicketPointers []*Ticket
+
 // Lista con todos los Tickets en el orden de lectura desde el fichero
-var ticketList []Ticket
+var ticketList Tickets
 
 // Mapa con los tickets indexados por Destino
-var destinationMap map[string][]*Ticket = make(map[string][]*Ticket)
+var destinationMap map[string]TicketPointers = make(map[string]TicketPointers)
 
 // Mapa con los tickets indexados por Periodo de tiempo
-var periodMap map[string][]*Ticket = make(map[string][]*Ticket)
+var periodMap map[string]TicketPointers = make(map[string]TicketPointers)
 
 /******************
 *
@@ -40,7 +43,7 @@ var periodMap map[string][]*Ticket = make(map[string][]*Ticket)
 *******************/
 
 // Agrega los tickets al listado y los indexa según destino y periodo
-func addTicketToList(t Ticket) []Ticket {
+func addTicketToList(t Ticket) Tickets {
 	ticketList = append(ticketList, t)
 
 	// Llenamos el mapa de tickets indexado por pais con un slice de punteros a los tickets
@@ -66,7 +69,7 @@ func addTicketToList(t Ticket) []Ticket {
 }
 
 // Obtiene un slice de tickets basado en su Destino
-func getTicketsByDestination(destination string) ([]*Ticket, error) {
+func getTicketsByDestination(destination string) (TicketPointers, error) {
 	ticketsByDestination := destinationMap[destination]
 	if ticketsByDestination == nil {
 		return nil, fmt.Errorf("no hay ningún ticket para el destino %s", destination)
@@ -199,7 +202,7 @@ func LoadFile(name string) {
 }
 
 // Obtiene la lista de todos los tickets
-func GetTicketList() []Ticket {
+func GetTicketList() Tickets {
 	return ticketList
 }
 
