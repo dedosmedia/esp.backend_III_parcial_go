@@ -2,31 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"parcial/tickets"
-	"strings"
 )
 
 func main() {
 
-	// Leer el fichero desde disco
-	data, err := os.ReadFile("tickets.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Separar cada línea del fichero
-	lines := strings.Split(string(data), "\n")
-	for _, line := range lines {
-
-		// recorrer cada línea y convertirla en Ticket
-		_, err := tickets.ConvertLineToTicket(line)
-		if err != nil {
-			fmt.Printf("No se procesará la siguiente línea: ´%s´ porque %s\n", line, err)
-			continue
-		}
-	}
+	tickets.LoadFile("tickets.csv")
 	fmt.Println("Total de registros correctos en el archivo: ", len(tickets.GetTicketList()))
 
 	ReportTicketsByDestination("Canada")

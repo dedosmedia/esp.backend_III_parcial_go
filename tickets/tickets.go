@@ -2,6 +2,8 @@ package tickets
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -63,6 +65,7 @@ func addTicketToList(t Ticket) []Ticket {
 	return ticketList
 }
 
+// Obtiene un slice de tickets basado en su Destino
 func getTicketsByDestination(destination string) ([]*Ticket, error) {
 	ticketsByDestination := destinationMap[destination]
 	if ticketsByDestination == nil {
@@ -71,9 +74,8 @@ func getTicketsByDestination(destination string) ([]*Ticket, error) {
 	return ticketsByDestination, nil
 }
 
+// Crea un Time con solo Hora y Minutos, a partir de un String "hh:mm"
 func convertStringToTime(timeStr string) (time.Time, error) {
-
-	//debería tener :
 
 	timePart := strings.Split(timeStr, ":")
 
@@ -115,54 +117,8 @@ func convertStringToTime(timeStr string) (time.Time, error) {
 
 }
 
-/******************
-*
-*  PUBLIC FUNCTIONS
-*
-*******************/
-
-func GetTicketList() []Ticket {
-	return ticketList
-}
-
-// Función que calcule cuántas personas viajan a un país determinado.
-func GetTotalTickets(destination string) (int, error) {
-
-	ticketsByDestination, err := getTicketsByDestination(destination)
-	if err != nil {
-		return 0, err
-	}
-	return len(ticketsByDestination), nil
-}
-
-// Función que calcula cuántas personas viajan en algún periodo de tiempo
-func GetCountByPeriod(time string) (int, error) {
-
-	if periodMap[time] == nil {
-		return 0, fmt.Errorf("no existe un período de tiempo llamado %s", time)
-	}
-
-	return len(periodMap[time]), nil
-}
-
-// Función que calcula el precio promedio de los tiquetes a un destino
-// se eliminó el parámetro total de la consigna porque no tenía ningún sentido
-func AverageDestination(destination string) (int, error) {
-
-	ticketsByDestination, err := getTicketsByDestination(destination)
-	if err != nil {
-		return 0, err
-	}
-	count, sum := 0, 0
-	for _, ticket := range ticketsByDestination {
-		sum += ticket.Precio
-		count++
-	}
-	return sum / count, nil
-}
-
 // Convierte una línea en Ticket
-func ConvertLineToTicket(line string) (*Ticket, error) {
+func convertLineToTicket(line string) (*Ticket, error) {
 
 	// partir la línea por ,
 	columns := strings.Split(line, ",")
@@ -210,10 +166,77 @@ func ConvertLineToTicket(line string) (*Ticket, error) {
 		HoraVuelo: HoraVuelo,
 		Precio:    Precio,
 	}
-	addTicketToList(*myTicket)
 
 	return myTicket, nil
 
+}
+
+/******************
+*
+*  PUBLIC FUNCTIONS
+*
+*******************/
+// Carga el fichero de disco y registra cada ticket en una lista de tickets
+func LoadFile(name string) {
+	// Leer el fichero desde disco
+	data, err := os.ReadFile(name)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Separar cada línea del fichero
+	lines := strings.Split(string(data), "\n")
+	for _, line := range lines {
+
+		// recorrer cada línea y convertirla en Ticket
+		ticket, err := convertLineToTicket(line)
+		if err != nil {
+			fmt.Printf("No se procesará la siguiente línea: ´%s´ porque %s\n", line, err)
+			continue
+		}
+		addTicketToList(*ticket)
+	}
+}
+
+// Obtiene la lista de todos los tickets
+func GetTicketList() []Ticket {
+	return ticketList
+}
+
+// Función que calcule cuántas personas viajan a un país determinado.
+func GetTotalTickets(destination string) (int, error) {
+
+	ticketsByDestination, err := getTicketsByDestination(destination)
+	if err != nil {
+		return 0, err
+	}
+	return len(ticketsByDestination), nil
+}
+
+// Función que calcula cuántas personas viajan en algún periodo de tiempo
+func GetCountByPeriod(time string) (int, error) {
+
+	if periodMap[time] == nil {
+		return 0, fmt.Errorf("no existe un período de tiempo llamado %s", time)
+	}
+
+	return len(periodMap[time]), nil
+}
+
+// Función que calcula el precio promedio de los tiquetes a un destino
+// se eliminó el parámetro total de la consigna porque no tenía ningún sentido
+func AverageDestination(destination string) (int, error) {
+
+	ticketsByDestination, err := getTicketsByDestination(destination)
+	if err != nil {
+		return 0, err
+	}
+	count, sum := 0, 0
+	for _, ticket := range ticketsByDestination {
+		sum += ticket.Precio
+		count++
+	}
+	return sum / count, nil
 }
 
 /******************
